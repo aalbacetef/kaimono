@@ -105,7 +105,7 @@ func (svc *Service) Create(w http.ResponseWriter, req *http.Request) {
 	svc.json(writeResponse(w, CreateCartResponse{Data: cart}))
 }
 
-// Update will create the Cart for the current session. It will reject
+// Update will update the Cart for the current session. It will reject
 // the Cart if the ID suplied does not match.
 //
 // Status codes:
@@ -154,6 +154,14 @@ func (svc *Service) Update(w http.ResponseWriter, req *http.Request) {
 
 }
 
+// Delete will delete the Cart for the current session. It will reject
+// the Cart if the ID suplied does not match the expected one.
+//
+// Status codes:
+//   - 204: Deleted succesfully
+//   - 400: No session found for request
+//   - 404: No cart found for this session
+//   - 500: unexpected error
 func (svc *Service) Delete(w http.ResponseWriter, req *http.Request) {
 	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
 	if errors.Is(err, ErrSessionNotFound) {

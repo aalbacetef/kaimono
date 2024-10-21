@@ -30,22 +30,28 @@ type DB interface {
 	DeleteCartForSession(sessionToken string) error
 
 	// DeleteCart will delete the Cart matching the ID. It doesn't check
-	// for permissions and shouldn't be used except for admin purposes.
+	// for permissions and should only be called after user has been authorized.
+	//
+	// If no Cart could be found, it will return ErrCartNotFound.
 	DeleteCart(cartID string) error
 
+	// UpdateCart will update the cart matching the cart.ID field. It doesn't check
+	// for permissions and should only be called after user has been authorized.
+	//
+	// If no Cart could be found, it will return ErrCartNotFound.
 	UpdateCart(cart Cart) error
-	LoadCart(cartID string)
 
+	// LookupCart will find the Cart matching the ID. It doesn't check
+	// for permissions and should only be called after user has been authorized.
+	//
+	// If no cart could be found, it will return ErrCartNotFound.
+	LookupCart(cartID string)
+
+	// LookupCart will find the Cart for this session.
+	//
+	// If no matching session is found, it will return ErrSessionNotFound.
+	// If no cart could be found, it will return ErrCartNotFound.
 	LookupCartForSession(sessionToken string) (Cart, error)
-}
-
-func DeleteCartForSession(db DB, sessionToken string) error {
-	cart, err := db.LookupCartForSession(sessionToken)
-	if err != nil {
-		return err
-	}
-
-	return db.DeleteCart(cart.ID)
 }
 
 // UserContextFetcher encapsulates functionality
