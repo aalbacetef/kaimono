@@ -26,7 +26,7 @@ linters-settings:
     max-blank-identifiers: 3
 
   dupl:
-    threshold: 100
+    threshold: 120
 
   dupword:
     keywords: []
@@ -96,12 +96,10 @@ linters-settings:
       - performance
 
   godot:
-    scope: all
+    scope: toplevel
     exclude: []
     period: true
     capital: true
-
-
 
   gosec:
     includes: []
@@ -112,7 +110,6 @@ linters-settings:
 
   gosimple:
     checks: ["all"]
-
 
   govet:
     enable-all: true
@@ -170,6 +167,12 @@ linters-settings:
   nestif:
     min-complexity: 3
 
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: kebab
+
   varnamelen:
     max-distance: 6
     min-name-length: 3
@@ -195,7 +198,9 @@ linters-settings:
       - T any
       - m map[string]int
       - r io.Reader
+      - r *chi.Mux
       - w io.Writer
+      - w http.ResponseWriter
       - fd *os.File
       - p []byte
       - n int
