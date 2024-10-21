@@ -2,6 +2,7 @@ package kaimono
 
 import (
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 )
@@ -18,6 +19,20 @@ type Service struct {
 	db            DB
 	usrCtxFetcher UserContextFetcher
 	logger        *slog.Logger
+}
+
+func NewService(db DB, usrCtxFetcher UserContextFetcher, authorizer Authorizer, logger *slog.Logger) (*Service, error) {
+
+	if logger == nil {
+		logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+
+	return &Service{
+		authorizer:    authorizer,
+		db:            db,
+		usrCtxFetcher: usrCtxFetcher,
+		logger:        logger,
+	}, nil
 }
 
 func (svc *Service) json(err error) {
