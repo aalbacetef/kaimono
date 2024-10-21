@@ -22,11 +22,26 @@ func (svc *Service) Router(base string) *chi.Mux {
 	return r
 }
 
-/*************************************
-*
-*         Standard routes
-*
-**************************************/
+func (svc *Service) fetchCtxOrExit(w http.ResponseWriter, req *http.Request) (UserContext, bool) {
+	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
+	if errors.Is(err, ErrSessionNotFound) {
+		svc.json(
+			writeError(w, http.StatusBadRequest, ErrSessionNotFound),
+		)
+
+		return usrCtx, false
+	}
+
+	if err != nil {
+		svc.json(
+			writeError(w, http.StatusInternalServerError, err),
+		)
+
+		return usrCtx, false
+	}
+
+	return usrCtx, true
+}
 
 // Get will return the Cart associated to the current user's session.
 //
@@ -36,19 +51,8 @@ func (svc *Service) Router(base string) *chi.Mux {
 //   - 404: No cart found for session
 //   - 500: unexpected error
 func (svc *Service) Get(w http.ResponseWriter, req *http.Request) {
-	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
-	if errors.Is(err, ErrSessionNotFound) {
-		svc.json(
-			writeError(w, http.StatusBadRequest, ErrSessionNotFound),
-		)
-
-		return
-	}
-
-	if err != nil {
-		svc.json(
-			writeError(w, http.StatusInternalServerError, err),
-		)
+	usrCtx, ok := svc.fetchCtxOrExit(w, req)
+	if !ok {
 		return
 	}
 
@@ -74,19 +78,8 @@ func (svc *Service) Get(w http.ResponseWriter, req *http.Request) {
 //   - 409: Cart already exists
 //   - 500: unexpected error
 func (svc *Service) Create(w http.ResponseWriter, req *http.Request) {
-	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
-	if errors.Is(err, ErrSessionNotFound) {
-		svc.json(
-			writeError(w, http.StatusBadRequest, ErrSessionNotFound),
-		)
-
-		return
-	}
-
-	if err != nil {
-		svc.json(
-			writeError(w, http.StatusInternalServerError, err),
-		)
+	usrCtx, ok := svc.fetchCtxOrExit(w, req)
+	if !ok {
 		return
 	}
 
@@ -115,19 +108,8 @@ func (svc *Service) Create(w http.ResponseWriter, req *http.Request) {
 //   - 404: No cart found for this session
 //   - 500: unexpected error
 func (svc *Service) Update(w http.ResponseWriter, req *http.Request) {
-	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
-	if errors.Is(err, ErrSessionNotFound) {
-		svc.json(
-			writeError(w, http.StatusBadRequest, ErrSessionNotFound),
-		)
-
-		return
-	}
-
-	if err != nil {
-		svc.json(
-			writeError(w, http.StatusInternalServerError, err),
-		)
+	usrCtx, ok := svc.fetchCtxOrExit(w, req)
+	if !ok {
 		return
 	}
 
@@ -152,30 +134,20 @@ func (svc *Service) Update(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	svc.json(writeResponse(w, http.StatusOK, UpdateCartResponse{Data: payload.Data}))
 }
 
 // Delete will delete the Cart for the current session. It will reject
 // the Cart if the ID suplied does not match the expected one.
 //
 // Status codes:
-//   - 204: Deleted succesfully
+//   - 204: Deleted successfully
 //   - 400: No session found for request
 //   - 404: No cart found for this session
 //   - 500: unexpected error
 func (svc *Service) Delete(w http.ResponseWriter, req *http.Request) {
-	usrCtx, err := svc.usrCtxFetcher.GetUserContext(req)
-	if errors.Is(err, ErrSessionNotFound) {
-		svc.json(
-			writeError(w, http.StatusBadRequest, ErrSessionNotFound),
-		)
-
-		return
-	}
-
-	if err != nil {
-		svc.json(
-			writeError(w, http.StatusInternalServerError, err),
-		)
+	usrCtx, ok := svc.fetchCtxOrExit(w, req)
+	if !ok {
 		return
 	}
 

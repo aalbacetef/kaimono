@@ -2,7 +2,7 @@ package kaimono
 
 type Cart struct {
 	ID        string     `json:"id"`
-	Items     []CartItem `json:"cart-items"`
+	Items     []CartItem `json:"items"`
 	Discounts []Discount `json:"discounts"`
 }
 

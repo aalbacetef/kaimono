@@ -19,12 +19,6 @@ func (svc *Service) AdminRouter(base string) *chi.Mux {
 	return r
 }
 
-/*************************************
-*
-*         Admin routes
-*
-**************************************/
-
 func (svc *Service) GetWithID(w http.ResponseWriter, req *http.Request) {}
 
 func (svc *Service) CreateWithoutSession(w http.ResponseWriter, req *http.Request) {}

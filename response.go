@@ -2,6 +2,7 @@ package kaimono
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 )
@@ -9,15 +10,25 @@ import (
 func writeResponse[T any](w http.ResponseWriter, code int, payload T) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
-	return json.NewEncoder(w).Encode(payload)
+
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		return fmt.Errorf("could not encode: %w", err)
+	}
+
+	return nil
 }
 
 func writeError(w http.ResponseWriter, code int, err error) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
+
 	resp := ErrorResponse{Data: nil, Error: err.Error()}
 
-	return json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		return fmt.Errorf("could not encode: %w", err)
+	}
+
+	return nil
 }
 
 func logIfError(l *slog.Logger, msg string, err error) {
@@ -45,3 +56,4 @@ type Response[T any] struct {
 type GetCartResponse = Response[Cart]
 type GetCartByIDResponse = Response[Cart]
 type CreateCartResponse = Response[Cart]
+type UpdateCartResponse = Response[Cart]
