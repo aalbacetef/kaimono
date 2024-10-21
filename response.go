@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func writeResponse[T any](w http.ResponseWriter, payload T) error {
+func writeResponse[T any](w http.ResponseWriter, code int, payload T) error {
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(code)
 	return json.NewEncoder(w).Encode(payload)
 }
 
@@ -44,5 +44,4 @@ type Response[T any] struct {
 
 type GetCartResponse = Response[Cart]
 type GetCartByIDResponse = Response[Cart]
-
 type CreateCartResponse = Response[Cart]

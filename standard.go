@@ -63,7 +63,7 @@ func (svc *Service) Get(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	svc.json(writeResponse(w, GetCartResponse{Data: cart}))
+	svc.json(writeResponse(w, http.StatusOK, GetCartResponse{Data: cart}))
 }
 
 // Create will create a new Cart for the current session.
@@ -102,14 +102,14 @@ func (svc *Service) Create(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// @TODO: add Location header
-	svc.json(writeResponse(w, CreateCartResponse{Data: cart}))
+	svc.json(writeResponse(w, http.StatusCreated, CreateCartResponse{Data: cart}))
 }
 
 // Update will update the Cart for the current session. It will reject
 // the Cart if the ID suplied does not match.
 //
 // Status codes:
-//   - 201: Created successfully
+//   - 200: Updated successfully
 //   - 400: No session found for request
 //   - 403: Cart ID is not the ID matching this session's Cart
 //   - 404: No cart found for this session

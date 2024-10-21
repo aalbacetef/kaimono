@@ -23,12 +23,6 @@ type DB interface {
 	// If a Cart already exists for that session, it will return ErrAlreadyExists.
 	CreateCart(sessionToken string) (Cart, error)
 
-	// DeleteCartForSession will delete the Cart for the given session.
-	//
-	// If no matching session is found, it will return ErrSessionNotFound.
-	// If no Cart for that session exists, it will return ErrCartNotFound.
-	DeleteCartForSession(sessionToken string) error
-
 	// DeleteCart will delete the Cart matching the ID. It doesn't check
 	// for permissions and should only be called after user has been authorized.
 	//
