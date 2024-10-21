@@ -6,15 +6,49 @@ import (
 	"net/http"
 )
 
+var (
+	ErrCartNotFound    = errors.New("cart not found")
+	ErrSessionNotFound = errors.New("session not found")
+	ErrAlreadyExists   = errors.New("already exists")
+	ErrInvalidID       = errors.New("invalid ID")
+)
+
 type Service struct {
+	authorizer    Authorizer
 	db            DB
 	usrCtxFetcher UserContextFetcher
-	l             *slog.Logger
+	logger        *slog.Logger
 }
 
 func (svc *Service) json(err error) {
-	logIfError(svc.l, "write response", err)
+	logIfError(svc.logger, "write response", err)
 }
+
+type Authorizer interface {
+
+	// AuthorizeUser will determine if the user (retrieved from the request)
+	// can perform the given operation on the specified resource.
+	AuthorizeUser(req *http.Request, op Operation, id string) error
+}
+
+type NotAuthorizedError struct {
+	Operation Operation `json:"operation"`
+	ID        string    `json:"id"`
+}
+
+type Operation struct {
+	Resource string        `json:"resource"`
+	Type     OperationType `json:"type"`
+}
+
+type OperationType string
+
+const (
+	CreateOp OperationType = "create"
+	ReadOp   OperationType = "read"
+	UpdateOp OperationType = "update"
+	DeleteOp OperationType = "delete"
+)
 
 type DB interface {
 	// CreateCart will instantiate a brand new empty Cart for the session.
@@ -65,10 +99,3 @@ type UserContext struct {
 func (u UserContext) IsLoggedIn() bool {
 	return u.UserID != ""
 }
-
-var (
-	ErrCartNotFound    = errors.New("cart not found")
-	ErrSessionNotFound = errors.New("session not found")
-	ErrAlreadyExists   = errors.New("already exists")
-	ErrInvalidID       = errors.New("invalid ID")
-)
