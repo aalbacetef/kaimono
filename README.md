@@ -2,7 +2,7 @@
 
 kaimono is a shopping cart library, that can be integrated into an existing server or as a standalone microservice.
 
-It is a proof-of-concept implementation and not currently used in production (you might want to reach for the battle-tested `medusa` project [link](https://github.com/medusajs/medusa)).
+It is a proof-of-concept implementation and not currently used in production (you might want to reach for the battle-tested `medusa` project at [github.com/medusajs/medusa](https://github.com/medusajs/medusa)).
 
 The word itself means "shopping" in japanese.
 
@@ -92,7 +92,7 @@ standardRouter := svc.Router("/cart")
 
 The responses have the format:
 
-```json
+```jsonc
 {
     "data": { /* depends on endpoint */ },
     "error": "<check depending on status code>"
