@@ -2,9 +2,19 @@
 
 kaimono is a shopping cart library, that can be integrated into an existing server or as a standalone microservice.
 
-It is a proof-of-concept and not currently used in production (you might want to reach for the battle-tested `medusa` project (link)[https://github.com/medusajs/medusa]).
+It is a proof-of-concept implementation and not currently used in production (you might want to reach for the battle-tested `medusa` project (link)[https://github.com/medusajs/medusa]).
 
 The word itself means "shopping" in japanese.
+
+**NOTE: currently in development work-in-progress and not officially released**.
+
+## Roadmap
+
+- [ ] Finish Readme / Documenting
+- [x] Implement standard routes
+- [ ] Implement Admin routes
+- [ ] Extensive tests
+- [ ] Write some example code
 
 ## Usage 
 
@@ -30,6 +40,49 @@ It is backed by three interfaces: a DB interface, an Authorizer interface and a 
 
 Service exposes two methods for every CRUD operation: one only acts within the scope of the request's associated user/session while the other skips checking the session and acts direclty on the cart specified by the ID.
 
-The idea is that one set of methods is used to expose shopping cart functionality to a website, while the other is used for admin purposes.
+The idea is that one set of methods is used to expose standard shopping cart functionality to a website, while the other is used for admin purposes.
 
+Services exposes a router function for getting the standard route router:
+
+```go
+standardRouter := svc.Router("/cart")
+```
+
+##### GET / 
+
+No route params. 
+
+Get will return the Cart associated to the current user's session.
+
+Status codes:
+    - 200: OK
+    - 400: No session found for request
+    - 404: No cart found for session
+    - 500: unexpected error
+
+Example Response:
+
+```json
+{
+    "id": "<cart ID>",
+    "items": [
+        {
+            "id": "<product ID>",
+            "quantity": 2,
+
+            // item-specific discounts
+            "discounts": [
+                {
+                    "id": "<discount-id>",
+                    "type": "fixed-amount",
+                    "value": "5.0",
+                }
+            ]
+        }
+    ],
+
+    // cart-wide discounts
+    "discounts": null
+}
+```
 
