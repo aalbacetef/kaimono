@@ -32,6 +32,45 @@ The library makes only a few assumptions about the library consumer's backend:
 
 ### Core types
 
+#### Cart, CartItem, Discount
+
+These are the main data types pass to and from the API.
+
+Their definitions are:
+
+```go
+type Cart struct {
+	ID        string     `json:"id"`
+	Items     []CartItem `json:"items"`
+	Discounts []Discount `json:"discounts"`
+}
+
+type CartItem struct {
+	ID        string     `json:"id"`
+	Quantity  int        `json:"quantity"`
+	Discounts []Discount `json:"discounts"`
+	Price     Price      `json:"price"`
+}
+
+type Price struct {
+	Currency string  `json:"currency"`
+	Value    float64 `json:"value"`
+}
+
+type DiscountType string
+
+const (
+	PercentageDiscount  DiscountType = "percentage"
+	FixedAmountDiscount DiscountType = "fixed-amount"
+)
+
+type Discount struct {
+	ID    string       `json:"id"`
+	Type  DiscountType `json:"type"`
+	Value float64      `json:"value"`
+}
+```
+
 #### Service 
 
 The Service type is the main type used to interact with the library. 
@@ -42,47 +81,23 @@ Service exposes two methods for every CRUD operation: one only acts within the s
 
 The idea is that one set of methods is used to expose standard shopping cart functionality to a website, while the other is used for admin purposes.
 
+#### Standard Routes
+
 Services exposes a router function for getting the standard route router:
 
 ```go
 standardRouter := svc.Router("/cart")
 ```
 
-##### GET / 
 
-No route params. 
+The responses have the format:
 
-Get will return the Cart associated to the current user's session.
-
-Status codes:
-    - 200: OK
-    - 400: No session found for request
-    - 404: No cart found for session
-    - 500: unexpected error
-
-Example Response:
-
-```jsonc
+```json
 {
-    "id": "<cart ID>",
-    "items": [
-        {
-            "id": "<product ID>",
-            "quantity": 2,
-
-            // item-specific discounts
-            "discounts": [
-                {
-                    "id": "<discount-id>",
-                    "type": "fixed-amount",
-                    "value": "5.0",
-                }
-            ]
-        }
-    ],
-
-    // cart-wide discounts
-    "discounts": null
+    "data": { /* depends on endpoint */ },
+    "error": "<check depending on status code>"
 }
 ```
 
+
+Check the documentation at: [pkg.go.dev/github.com/aalbacetef/kaimono](https://pkg.go.dev/github.com/aalbacetef/kaimono) for full details of usage.
