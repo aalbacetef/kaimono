@@ -18,15 +18,15 @@ type Price struct {
 	Value    float64 `json:"value"`
 }
 
-type Discount struct {
-	ID    string       `json:"id"`
-	Type  DiscountType `json:"type"`
-	Value float64      `json:"value"`
-}
-
 type DiscountType string
 
 const (
 	PercentageDiscount  DiscountType = "percentage"
 	FixedAmountDiscount DiscountType = "fixed-amount"
 )
+
+type Discount struct {
+	ID    string       `json:"id"`
+	Type  DiscountType `json:"type"`
+	Value float64      `json:"value"`
+}

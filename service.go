@@ -22,7 +22,6 @@ type Service struct {
 }
 
 func NewService(db DB, usrCtxFetcher UserContextFetcher, authorizer Authorizer, logger *slog.Logger) (*Service, error) {
-
 	if logger == nil {
 		logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
 	}
