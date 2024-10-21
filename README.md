@@ -6,7 +6,7 @@ It is a proof-of-concept implementation and not currently used in production (yo
 
 The word itself means "shopping" in japanese.
 
-**NOTE: currently in development work-in-progress and not officially released**.
+**NOTE: currently in development/work-in-progress and not officially released**.
 
 ## Roadmap
 
@@ -62,7 +62,7 @@ Status codes:
 
 Example Response:
 
-```json
+```jsonc
 {
     "id": "<cart ID>",
     "items": [
