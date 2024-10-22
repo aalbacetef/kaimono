@@ -1,24 +1,12 @@
 package kaimono
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 )
-
-func setCookie(req *http.Request, v string) {
-	cookie := http.Cookie{
-		Name:     testCookieName,
-		Value:    v,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
-
-	req.AddCookie(&cookie)
-}
 
 func TestStandardGet(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
@@ -30,15 +18,33 @@ func TestStandardGet(t *testing.T) {
 		t.Fatalf("error: %v", err)
 	}
 
+	// add an empty cart to the first session
+	mock.data[mock.sessions[0]] = mkEmptyTestCart()
+
 	tests := []struct {
 		label        string
 		sessionToken string
 		wantCode     int
 	}{
 		{
+			label:        "should return 200 on cart existing for session",
+			sessionToken: mock.sessions[0],
+			wantCode:     http.StatusOK,
+		},
+		{
 			label:        "should return 400 for non-existent sessions",
 			sessionToken: "non-existent-session",
-			wantCode:     400,
+			wantCode:     http.StatusBadRequest,
+		},
+		{
+			label:        "should return 404 for non-existent carts",
+			sessionToken: mock.sessions[1],
+			wantCode:     http.StatusNotFound,
+		},
+		{
+			label:        "should return 500 on the rest of the errors",
+			sessionToken: "", // our test func won't add a session on empty tokens
+			wantCode:     http.StatusInternalServerError,
 		},
 	}
 
@@ -49,7 +55,9 @@ func TestStandardGet(t *testing.T) {
 				t.Fatalf("could not make request: %v", err)
 			}
 
-			setCookie(req, c.sessionToken)
+			if c.sessionToken != "" {
+				setTestCookie(req, c.sessionToken)
+			}
 
 			w := httptest.NewRecorder()
 			svc.Get(w, req)
@@ -57,17 +65,20 @@ func TestStandardGet(t *testing.T) {
 			result := w.Result()
 			defer result.Body.Close()
 
-			m := make(map[string]any)
-
-			if err := json.NewDecoder(result.Body).Decode(&m); err != nil {
-				t.Fatalf("error decoding body: %v", err)
-			}
-
-			t.Logf("body: %+v", m)
-
 			if result.StatusCode != c.wantCode {
 				t.Fatalf("got code %d, want %d", result.StatusCode, c.wantCode)
 			}
 		})
 	}
+}
+
+func setTestCookie(req *http.Request, v string) {
+	cookie := http.Cookie{
+		Name:     testCookieName,
+		Value:    v,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	req.AddCookie(&cookie)
 }
