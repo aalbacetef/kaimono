@@ -103,3 +103,26 @@ The responses have the format:
 
 
 Check the documentation at: [pkg.go.dev/github.com/aalbacetef/kaimono](https://pkg.go.dev/github.com/aalbacetef/kaimono) for full details of usage.
+
+#### Admin Routes
+
+Services exposes a router function for getting the admin route router:
+
+```go
+adminRouter := svc.AdminRouter("/cart")
+```
+
+
+The responses have the format:
+
+```jsonc
+{
+    "data": { /* depends on endpoint */ },
+    "error": "<check depending on status code>"
+}
+```
+
+
+Check the documentation at: [pkg.go.dev/github.com/aalbacetef/kaimono](https://pkg.go.dev/github.com/aalbacetef/kaimono) for full details of usage.
+
+
