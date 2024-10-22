@@ -57,8 +57,12 @@ func (svc *Service) Get(w http.ResponseWriter, req *http.Request) {
 	}
 
 	cart, err := svc.db.LookupCartForSession(usrCtx.SessionToken)
+	if errors.Is(err, ErrSessionNotFound) {
+		svc.json(writeError(w, http.StatusBadRequest, err))
+	}
+
 	if errors.Is(err, ErrCartNotFound) {
-		svc.json(writeError(w, http.StatusNotFound, ErrCartNotFound))
+		svc.json(writeError(w, http.StatusNotFound, err))
 		return
 	}
 
