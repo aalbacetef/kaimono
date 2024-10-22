@@ -87,7 +87,7 @@ type DB interface {
 	// for permissions and should only be called after user has been authorized.
 	//
 	// If no cart could be found, it will return ErrCartNotFound.
-	LookupCart(cartID string)
+	LookupCart(cartID string) (Cart, error)
 
 	// LookupCart will find the Cart for this session.
 	//
