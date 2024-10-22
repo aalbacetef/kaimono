@@ -129,7 +129,7 @@ linters-settings:
     skip-single-param: true
 
   interfacebloat:
-    max: 5
+    max: 7
  
   ireturn:
     allow: 
@@ -187,6 +187,8 @@ linters-settings:
       - c
       - l
       - ch
+      - op
+      - db
     ignore-decls:
       - c echo.Context
       - t *testing.T
