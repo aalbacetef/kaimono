@@ -2,6 +2,7 @@ package kaimono
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -48,6 +49,10 @@ type Authorizer interface {
 type NotAuthorizedError struct {
 	Operation Operation `json:"operation"`
 	ID        string    `json:"id"`
+}
+
+func (e NotAuthorizedError) Error() string {
+	return fmt.Sprintf("could not authorize user for op=(%+v) with resource ID:(%s)", e.Operation, e.ID)
 }
 
 type Operation struct {
