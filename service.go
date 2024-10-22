@@ -43,7 +43,7 @@ type Authorizer interface {
 
 	// AuthorizeUser will determine if the user (retrieved from the request)
 	// can perform the given operation on the specified resource.
-	AuthorizeUser(req *http.Request, op Operation, id string) error
+	AuthorizeUser(req *http.Request, op Operation, resourceID string) error
 }
 
 type NotAuthorizedError struct {

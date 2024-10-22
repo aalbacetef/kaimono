@@ -11,7 +11,7 @@ import (
 
 const testCookieName = "test-cookie"
 
-// mockBackend implements the main service interfaces
+// mockBackend implements the main service interfaces.
 type mockBackend struct {
 	users    []UserContext
 	sessions []string
@@ -76,6 +76,7 @@ func (mock *mockBackend) CreateCartForSession(sessionToken string) (Cart, error)
 	defer mock.mu.Unlock()
 
 	index := -1
+
 	for k, s := range mock.sessions {
 		if s == sessionToken {
 			index = k
@@ -116,6 +117,7 @@ func (mock *mockBackend) DeleteCart(cartID string) error {
 	defer mock.mu.Unlock()
 
 	index := -1
+
 	for k, cart := range mock.carts {
 		if cart.ID == cartID {
 			index = k
@@ -174,6 +176,7 @@ func (mock *mockBackend) LookupCartForSession(sessionToken string) (Cart, error)
 	defer mock.mu.Unlock()
 
 	index := -1
+
 	for k, s := range mock.sessions {
 		if s == sessionToken {
 			index = k
@@ -197,7 +200,7 @@ func (mock *mockBackend) AssignCartToSession(string, string) error {
 	return errors.New("not implemented")
 }
 
-func (mock *mockBackend) AuthorizeUser(req *http.Request, op Operation, id string) error {
+func (mock *mockBackend) AuthorizeUser(req *http.Request, op Operation, resourceID string) error {
 	usrCtx, err := mock.GetUserContext(req)
 	if err != nil {
 		return err
@@ -207,7 +210,7 @@ func (mock *mockBackend) AuthorizeUser(req *http.Request, op Operation, id strin
 		return nil
 	}
 
-	return NotAuthorizedError{Operation: op, ID: id}
+	return NotAuthorizedError{Operation: op, ID: resourceID}
 }
 
 func removeAt[T any](arr []T, index int) []T {
