@@ -15,7 +15,8 @@ const testCookieName = "test-cookie"
 type mockBackend struct {
 	users    []UserContext
 	sessions []string
-	data     map[string]Cart
+	data     map[string]int
+	carts    []Cart
 	mu       sync.Mutex
 }
 
@@ -39,7 +40,8 @@ func newMockBackend() *mockBackend {
 	}
 
 	mock := &mockBackend{
-		data:     make(map[string]Cart),
+		carts:    []Cart{},
+		data:     make(map[string]int),
 		sessions: sessions,
 		users:    users,
 	}
@@ -69,7 +71,7 @@ func (mock *mockBackend) GetUserContext(req *http.Request) (UserContext, error) 
 	return usrCtx, nil
 }
 
-func (mock *mockBackend) CreateCart(sessionToken string) (Cart, error) {
+func (mock *mockBackend) CreateCartForSession(sessionToken string) (Cart, error) {
 	mock.mu.Lock()
 	defer mock.mu.Unlock()
 
@@ -85,10 +87,26 @@ func (mock *mockBackend) CreateCart(sessionToken string) (Cart, error) {
 		return Cart{}, ErrSessionNotFound
 	}
 
-	cart, found := mock.data[sessionToken]
-	if !found {
-		return cart, ErrCartNotFound
+	cartIndex, found := mock.data[sessionToken]
+	if found {
+		return mock.carts[cartIndex], ErrAlreadyExists
 	}
+
+	cart := mkEmptyTestCart()
+	mock.carts = append(mock.carts, cart)
+	cartIndex = len(mock.carts) - 1
+
+	mock.data[sessionToken] = cartIndex
+
+	return cart, nil
+}
+
+func (mock *mockBackend) CreateCart() (Cart, error) {
+	mock.mu.Lock()
+	defer mock.mu.Unlock()
+
+	cart := mkEmptyTestCart()
+	mock.carts = append(mock.carts, cart)
 
 	return cart, nil
 }
@@ -97,23 +115,40 @@ func (mock *mockBackend) DeleteCart(cartID string) error {
 	mock.mu.Lock()
 	defer mock.mu.Unlock()
 
-	for key, cart := range mock.data {
+	index := -1
+	for k, cart := range mock.carts {
 		if cart.ID == cartID {
-			delete(mock.data, key)
-			return nil
+			index = k
+			break
 		}
 	}
 
-	return ErrCartNotFound
+	if index == -1 {
+		return ErrCartNotFound
+	}
+
+	// delete entry for session, if found
+	for key, indx := range mock.data {
+		cart := mock.carts[indx]
+		if cart.ID == cartID {
+			delete(mock.data, key)
+			break
+		}
+	}
+
+	// remove from carts
+	mock.carts = removeAt[Cart](mock.carts, index)
+
+	return nil
 }
 
 func (mock *mockBackend) UpdateCart(cart Cart) error {
 	mock.mu.Lock()
 	defer mock.mu.Unlock()
 
-	for key, _cart := range mock.data {
-		if _cart.ID == cart.ID {
-			mock.data[key] = cart
+	for k, c := range mock.carts {
+		if c.ID == cart.ID {
+			mock.carts[k] = cart
 			return nil
 		}
 	}
@@ -125,7 +160,7 @@ func (mock *mockBackend) LookupCart(cartID string) (Cart, error) {
 	mock.mu.Lock()
 	defer mock.mu.Unlock()
 
-	for _, cart := range mock.data {
+	for _, cart := range mock.carts {
 		if cart.ID == cartID {
 			return cart, nil
 		}
@@ -150,15 +185,15 @@ func (mock *mockBackend) LookupCartForSession(sessionToken string) (Cart, error)
 		return Cart{}, ErrSessionNotFound
 	}
 
-	cart, found := mock.data[sessionToken]
+	cartIndex, found := mock.data[sessionToken]
 	if !found {
-		return cart, ErrCartNotFound
+		return Cart{}, ErrCartNotFound
 	}
 
-	return cart, nil
+	return mock.carts[cartIndex], nil
 }
 
-func (mock *mockBackend) AssignCartToSession(sessionToken string) error {
+func (mock *mockBackend) AssignCartToSession(string, string) error {
 	return errors.New("not implemented")
 }
 
@@ -173,4 +208,8 @@ func (mock *mockBackend) AuthorizeUser(req *http.Request, op Operation, id strin
 	}
 
 	return NotAuthorizedError{Operation: op, ID: id}
+}
+
+func removeAt[T any](arr []T, index int) []T {
+	return append(arr[:index-1], arr[index:]...)
 }

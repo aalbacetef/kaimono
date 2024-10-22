@@ -19,7 +19,8 @@ func TestStandardGet(t *testing.T) {
 	}
 
 	// add an empty cart to the first session
-	mock.data[mock.sessions[0]] = mkEmptyTestCart()
+	mock.carts = append(mock.carts, mkEmptyTestCart())
+	mock.data[mock.sessions[0]] = len(mock.carts) - 1
 
 	tests := []struct {
 		label        string
