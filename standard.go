@@ -87,7 +87,7 @@ func (svc *Service) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cart, err := svc.db.CreateCart(usrCtx.SessionToken)
+	cart, err := svc.db.CreateCartForSession(usrCtx.SessionToken)
 	if errors.Is(err, ErrAlreadyExists) {
 		svc.json(writeError(w, http.StatusConflict, err))
 		return

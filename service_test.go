@@ -1,6 +1,7 @@
 package kaimono
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -155,6 +156,10 @@ func (mock *mockBackend) LookupCartForSession(sessionToken string) (Cart, error)
 	}
 
 	return cart, nil
+}
+
+func (mock *mockBackend) AssignCartToSession(sessionToken string) error {
+	return errors.New("not implemented")
 }
 
 func (mock *mockBackend) AuthorizeUser(req *http.Request, op Operation, id string) error {

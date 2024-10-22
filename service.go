@@ -70,11 +70,14 @@ const (
 )
 
 type DB interface {
-	// CreateCart will instantiate a brand new empty Cart for the session.
+	// CreateCartForSession will instantiate a brand new empty Cart for the session.
 	//
 	// If no matching session is found it will return ErrSessionNotFound.
 	// If a Cart already exists for that session, it will return ErrAlreadyExists.
-	CreateCart(sessionToken string) (Cart, error)
+	CreateCartForSession(sessionToken string) (Cart, error)
+
+	// CreateCart will create a Cart without assigning it to a session.
+	CreateCart() (Cart, error)
 
 	// DeleteCart will delete the Cart matching the ID. It doesn't check
 	// for permissions and should only be called after user has been authorized.
@@ -99,6 +102,13 @@ type DB interface {
 	// If no matching session is found, it will return ErrSessionNotFound.
 	// If no cart could be found, it will return ErrCartNotFound.
 	LookupCartForSession(sessionToken string) (Cart, error)
+
+	// AssignCartToSession will assign the cart specified by ID to the given
+	// session.
+	//
+	// If no matching session is found, it will return ErrSessionNotFound.
+	// If no cart could be found, it will return ErrCartNotFound.
+	AssignCartToSession(cartID, sessionToken string) error
 }
 
 // UserContextFetcher encapsulates functionality
