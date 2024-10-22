@@ -1,3 +1,5 @@
+![CI status](https://github.com/aalbacetef/kaimono/actions/workflows/ci.yml/badge.svg)   [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Go Report Card](https://goreportcard.com/badge/github.com/aalbacetef/kaimono)](https://goreportcard.com/github.com/aalbacetef/kaimono)
+
 # kaimono
 
 kaimono is a shopping cart library, that can be integrated into an existing server or as a standalone microservice.
@@ -12,7 +14,7 @@ The word itself means "shopping" in japanese.
 
 - [ ] Finish Readme / Documenting
 - [x] Implement standard routes
-- [ ] Implement Admin routes
+- [x] Implement Admin routes
 - [ ] Extensive tests
 - [ ] Write some example code
 
